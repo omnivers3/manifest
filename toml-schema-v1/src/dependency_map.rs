@@ -15,24 +15,68 @@ impl std::ops::Deref for DependencyMap {
 
 impl std::cmp::PartialEq for DependencyMap {
     fn eq(&self, other: &Self) -> bool {
-        let mut other_keys: Vec<&String> = other.keys().collect();
-        let keys = self.keys();
-        let len = keys.len();
-        if other_keys.len() != len { // Differnt sized key spaces
-            return false;
-        }
-        if len == 0 { // No keys on either side
-            return true;
-        }
-        for i in 0..other_keys.len() {
-            // If any key isn't found then equality fails
-            if !self.contains_key(other_keys[i]) { return false; }
-            other_keys.remove(i);
-        }
-        // If there are any remaining keys that weren't matched then equality fails
-        if other_keys.len() != 0 {
-            return false;
-        }
-        true
+        self.keys().eq(other.keys()) && self.values().eq(other.values())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::collections::{ BTreeMap };
+
+    use crate::{ Dependency, DependencyMap };
+
+    #[test]
+    fn empty_maps_should_be_equal() {
+        let dm1 = DependencyMap(BTreeMap::default());
+        let dm2 = DependencyMap(BTreeMap::default());
+
+        assert_eq!(dm1, dm2);
+    }
+
+    #[test]
+    fn empty_maps_should_not_be_equal_to_non_empty() {
+        let dm1 = DependencyMap(BTreeMap::default());
+
+        let mut dm2 = BTreeMap::new();
+        dm2.insert("a".to_owned(), Dependency::Simple("".to_owned()));
+
+        assert_ne!(dm1, DependencyMap(dm2));
+    }
+
+    #[test]
+    fn maps_with_the_same_values_should_be_equal() {
+        let mut dm1 = BTreeMap::default();
+        dm1.insert("a".to_owned(), Dependency::Simple("".to_owned()));
+
+        let mut dm2 = BTreeMap::new();
+        dm2.insert("a".to_owned(), Dependency::Simple("".to_owned()));
+
+        assert_eq!(DependencyMap(dm1), DependencyMap(dm2));
+    }
+
+    #[test]
+    fn multi_value_maps_with_the_same_values_in_different_insert_order_should_be_equal() {
+        let mut dm1 = BTreeMap::default();
+        dm1.insert("a".to_owned(), Dependency::Simple("".to_owned()));
+        dm1.insert("b".to_owned(), Dependency::Simple("2".to_owned()));
+
+        let mut dm2 = BTreeMap::new();
+        dm2.insert("b".to_owned(), Dependency::Simple("2".to_owned()));
+        dm2.insert("a".to_owned(), Dependency::Simple("".to_owned()));
+
+        assert_eq!(DependencyMap(dm1), DependencyMap(dm2));
+    }
+
+    #[test]
+    fn multi_value_maps_with_different_values_and_different_insert_order_should_not_be_equal() {
+        let mut dm1 = BTreeMap::default();
+        dm1.insert("a".to_owned(), Dependency::Simple("".to_owned()));
+        dm1.insert("b".to_owned(), Dependency::Simple("2".to_owned()));
+
+        let mut dm2 = BTreeMap::new();
+        dm2.insert("b".to_owned(), Dependency::Simple("3".to_owned()));
+        dm2.insert("a".to_owned(), Dependency::Simple("".to_owned()));
+
+        assert_ne!(DependencyMap(dm1), DependencyMap(dm2));
     }
 }

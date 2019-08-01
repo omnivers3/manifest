@@ -24,7 +24,7 @@ pub struct DetailedDependency {
     pub public: Option<bool>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(untagged)]
 pub enum Dependency {
     Simple(String),

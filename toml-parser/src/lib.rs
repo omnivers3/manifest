@@ -1,7 +1,7 @@
 extern crate failure;
 extern crate serde;
 extern crate serde_ignored;
-extern crate omni_manifest_toml_schema_v1 as schema;
+extern crate omni_manifest_toml_schema_v1 as schema_v1;
 
 use failure::{ Fail };
 use serde::de::Deserialize;
@@ -98,7 +98,7 @@ fn stringify_serde_ignored_path(dst: &mut String, path: &serde_ignored::Path<'_>
     }
 }
 
-pub fn parse_v1(data: &str) -> Result<schema::Manifest> {
+pub fn parse_v1(data: &str) -> Result<schema_v1::Manifest> {
     parse_cargo_toml(data)
         .and_then(|toml| {
             let mut ignored = Vec::new();

@@ -1,4 +1,3 @@
-
 #[derive(Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub struct Workspace {
