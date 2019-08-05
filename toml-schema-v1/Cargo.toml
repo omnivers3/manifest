@@ -8,13 +8,13 @@ name = "omni_manifest_toml_schema_v1"
 path = "src/lib.rs"
 
 [dependencies]
-log = "0.4.8"
+# log = "0.4.8"
 toml = "0.5.1"
-url = "2.0.0"
+url = "2.1.0"
 url_serde = "0.2.0"
 
-[dependencies.failure]
-version = "0.1.5"
+# [dependencies.failure]
+# version = "0.1.5"
 # default-features = false
 # features = ["std"]
 
@@ -25,6 +25,9 @@ features = ["serde"]
 [dependencies.serde]
 version = "1.0.98"
 features = ["derive"]
+
+# [dependencies.omni_manifest_v1]
+# path = "../v1"
 
 # [dev-dependencies]
 # logging = { path = "../logging" }

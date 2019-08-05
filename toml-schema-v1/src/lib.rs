@@ -1,3 +1,4 @@
+// extern crate failure;
 extern crate semver;
 #[macro_use]
 extern crate serde;
@@ -34,3 +35,23 @@ pub use self::target::*;
 pub use self::u32_or_bool::*;
 pub use self::vec_string_or_bool::*;
 pub use self::workspace::*;
+
+// use failure::{ Fail };
+// use std::fmt;
+
+// #[derive(Debug, Fail)]
+// pub enum Error {
+//     None
+// }
+
+// impl fmt::Display for Error {
+//     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+//         match self {
+//             Error::None => {
+//                 write!(f, "None")
+//             }
+//         }
+//     }
+// }
+
+// pub type Result<T> = std::result::Result<T, Error>;

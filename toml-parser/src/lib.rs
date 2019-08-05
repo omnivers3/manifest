@@ -118,9 +118,14 @@ pub fn parse_v1(data: &str) -> Result<schema_v1::Manifest> {
         })
 }
 
+// pub fn parse(data: &str) -> Result<v1::Manifest> {
+
+// }
+
 #[cfg(test)]
 mod omni_toml_parser_tests {
     extern crate semver;
+    extern crate omni_manifest_toml_schema_v1 as schema_v1;
 
     use crate::{ Error, TOML_WITHOUT_NEWLINES };
     use crate::{ parse_cargo_toml, parse_toml, parse_v1 };
@@ -260,6 +265,111 @@ mod omni_toml_parser_tests {
                 }
             },
             Err(err) => assert!(false, "should have parsed valid minimum package structure but was:\n{}", err),
+        }
+    }
+
+    #[test]
+    fn parse_package_dependency() {
+        match parse_v1(r#"
+            [package]
+            name = "foo"
+            version = "1.0.0"
+
+            [dependencies]
+            dep1 = "1.0.0"
+        "#) {
+            Ok(m) => {
+                match m.dependencies {
+                    None => assert!(false, "should have parsed dep1 dependency:\n{:?}", m),
+                    Some (deps) => {
+                        assert!(deps.contains_key("dep1"), "should contain value for dependency dep1");
+                        let dep1 = deps.get("dep1").unwrap();
+                        assert_eq!(&schema_v1::Dependency::Simple("1.0.0".to_owned()), dep1);
+                    },
+                }
+            },
+            Err(err) => assert!(false, "should have parsed valid package with dependency but was:\n{}", err),
+        }
+    }
+
+    #[test]
+    fn parse_package_dependency_with_inline_version() {
+        match parse_v1(r#"
+            [package]
+            name = "foo"
+            version = "1.0.0"
+
+            [dependencies]
+            dep1 = { version = "1.0.0" }
+        "#) {
+            Ok(m) => {
+                match m.dependencies {
+                    None => assert!(false, "should have parsed dep1 dependency:\n{:?}", m),
+                    Some (deps) => {
+                        assert!(deps.contains_key("dep1"), "should contain value for dependency dep1");
+                        let dep1 = deps.get("dep1").unwrap();
+                        let expected = schema_v1::DetailedDependency {
+                            version: Some("1.0.0".to_owned()),
+                            .. Default::default()
+                        };
+                        assert_eq!(&schema_v1::Dependency::Detailed(expected), dep1);
+                    },
+                }
+            },
+            Err(err) => assert!(false, "should have parsed valid package with dependency but was:\n{}", err),
+        }
+    }
+
+    #[test]
+    fn parse_package_dependency_with_version_field() {
+        match parse_v1(r#"
+            [package]
+            name = "foo"
+            version = "1.0.0"
+
+            [dependencies.dep1]
+            version = "1.0.0"
+        "#) {
+            Ok(m) => {
+                match m.dependencies {
+                    None => assert!(false, "should have parsed dep1 dependency:\n{:?}", m),
+                    Some (deps) => {
+                        assert!(deps.contains_key("dep1"), "should contain value for dependency dep1");
+                        let dep1 = deps.get("dep1").unwrap();
+                        let expected = schema_v1::DetailedDependency {
+                            version: Some("1.0.0".to_owned()),
+                            .. Default::default()
+                        };
+                        assert_eq!(&schema_v1::Dependency::Detailed(expected), dep1);
+                    },
+                }
+            },
+            Err(err) => assert!(false, "should have parsed valid package with dependency but was:\n{}", err),
+        }
+    }
+
+    #[test]
+    fn parse_package_with_empty_version_field() {
+        match parse_v1(r#"
+        [package]
+        name = "foo"
+        version = "1.0.0"
+
+        [dependencies]
+        dep1 = ""
+        "#) {
+            Ok(m) => {
+                match m.dependencies {
+                    None => assert!(false, "should have parsed dep1 dependency:\n{:?}", m),
+                    Some (deps) => {
+                        assert!(deps.contains_key("dep1"), "should contain value for dependency dep1");
+                        let dep1 = deps.get("dep1").unwrap();
+                        let expected = schema_v1::Dependency::Simple("".to_owned());
+                        assert_eq!(&expected, dep1);
+                    },
+                }
+            },
+            Err(err) => assert!(false, "should have parsed valid package with dependency but was:\n{}", err),
         }
     }
 }

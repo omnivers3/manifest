@@ -5,13 +5,6 @@ use serde::{Deserialize, Serialize};
 pub struct DetailedDependency {
     pub version: Option<String>,
     pub registry: Option<String>,
-    /// The URL of the `registry` field.
-    /// This is an internal implementation detail. When Cargo creates a
-    /// package, it replaces `registry` with `registry-index` so that the
-    /// manifest contains the correct URL. All users won't have the same
-    /// registry names configured, so Cargo can't rely on just the name for
-    /// crates published by other users.
-    pub registry_index: Option<String>,
     pub path: Option<String>,
     pub git: Option<String>,
     pub branch: Option<String>,
