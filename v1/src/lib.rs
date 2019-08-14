@@ -1,4 +1,5 @@
 extern crate failure;
+extern crate semver;
 extern crate url;
 
 mod dependency;

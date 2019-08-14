@@ -3,5 +3,5 @@ members = [
     "toml-parser",
     "toml-schema-v1",
     "toml-schema-v1-to-v1",
-    "v1",
+    "v1"
 ]

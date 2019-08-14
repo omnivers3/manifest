@@ -1,5 +1,7 @@
 use std::path::PathBuf;
 
+use semver::VersionReq;
+
 use crate::{ GitRepository };
 
 #[derive(Clone, Debug, PartialEq)]
@@ -8,7 +10,7 @@ pub enum Dependency {
     Git(GitRepository),
     LocalPath(PathBuf),
     CustomRegistry(String), // TODO: Add locked (source_id.rs line 139)?
-    DefaultRegistry(String), // Crates.io
+    DefaultRegistry(VersionReq), // Crates.io
     Directory(PathBuf),
 }
 
