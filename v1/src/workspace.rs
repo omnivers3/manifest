@@ -1,5 +1,4 @@
-#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
-#[serde(rename_all = "kebab-case")]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Workspace {
     pub members: Option<Vec<String>>,
     pub default_members: Option<Vec<String>>,

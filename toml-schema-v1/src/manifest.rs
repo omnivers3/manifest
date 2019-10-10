@@ -8,7 +8,8 @@ pub type ExampleTarget = Target;
 pub type TestTarget = Target;
 pub type BenchTarget = Target;
 
-#[derive(Debug, Deserialize, PartialEq, Serialize)]
+#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Deserialize, Serialize)]
 #[serde(rename_all = "kebab-case")]
 pub struct Manifest {
     pub cargo_features: Option<Vec<String>>,

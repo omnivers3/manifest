@@ -1,7 +1,7 @@
 use crate::{ DependencyMap };
 
 /// Corresponds to a `target` entry, but `Target` is already used.
-#[derive(Serialize, Deserialize, Debug, PartialEq)]
+#[derive(Clone, Serialize, Deserialize, Debug, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub struct Platform {
     pub dependencies: Option<DependencyMap>,

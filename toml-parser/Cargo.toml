@@ -8,20 +8,23 @@ name = "omni_manifest_toml_parser"
 path = "src/lib.rs"
 
 [dependencies]
-serde_ignored = "0.0.4"
-toml = "0.5.1"
+serde_ignored = "0.1.0"
+toml = "0.5.3"
 
 [dependencies.serde]
-version = "1.0.98"
+version = "1.0.99"
 features = ["derive"]
-
-[dependencies.failure]
-version = "0.1.5"
-default-features = false
-features = ["std"]
 
 [dependencies.omni-manifest-toml-schema-v1]
 path = "../toml-schema-v1"
+version = "1.0.0"
+
+[dependencies.omni-manifest-toml-schema-v1-to-v1]
+path = "../toml-schema-v1-to-v1"
+version = "1.0.0"
+
+[dependencies.omni-manifest-v1]
+path = "../v1"
 version = "1.0.0"
 
 [dev-dependencies]

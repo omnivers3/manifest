@@ -1,4 +1,4 @@
-extern crate failure;
+// extern crate failure;
 extern crate semver;
 extern crate url;
 
@@ -6,17 +6,24 @@ mod dependency;
 mod git_reference;
 mod git_repository;
 mod into_url;
+mod manifest;
+mod profile;
+mod workspace;
 
 pub use self::dependency::*;
 pub use self::git_reference::*;
 pub use self::git_repository::*;
 pub use into_url::*;
+pub use manifest::*;
+pub use profile::*;
+pub use workspace::*;
 
-use failure::{ Fail };
+// use failure::{ Fail };
 use std::fmt;
 use std::path::{ PathBuf };
 
-#[derive(Debug, Fail, PartialEq)]
+// #[derive(Debug, Fail, PartialEq)]
+#[derive(Debug, PartialEq)]
 pub enum Error {
     GitBaseUrlNotSupported(url::Url),
     InvalidDependencyName(String),

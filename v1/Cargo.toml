@@ -1,13 +1,10 @@
 [package]
-name = "omni_manifest_v1"
+name = "omni-manifest-v1"
 version = "1.0.0"
 authors = ["Perry Birch <perrybirch@vizidrix.com>"]
 
 [dependencies]
 url = "2.1.0"
-
-[dependencies.failure]
-version = "0.1.5"
 
 [dependencies.semver]
 version = "0.9.0"

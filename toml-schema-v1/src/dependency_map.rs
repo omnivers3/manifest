@@ -2,7 +2,7 @@ use std::collections::{ BTreeMap };
 
 use crate::{ Dependency };
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct DependencyMap(pub BTreeMap<String, Dependency>);
 
 impl std::ops::Deref for DependencyMap {

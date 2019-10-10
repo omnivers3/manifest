@@ -1,13 +1,16 @@
-extern crate failure;
+// extern crate failure;
 extern crate serde;
 extern crate serde_ignored;
 extern crate omni_manifest_toml_schema_v1 as schema_v1;
+extern crate omni_manifest_toml_schema_v1_to_v1 as schema_v1_to_v1;
+extern crate omni_manifest_v1 as v1;
 
-use failure::{ Fail };
+// use failure::{ Fail };
 use serde::de::Deserialize;
 use std::fmt;
 
-#[derive(Debug, Fail)]
+// #[derive(Debug, Fail)]
+#[derive(Debug)]
 pub enum Error {
     DeserializerError(toml::de::Error),
     FailedToParseToml(String),
@@ -98,7 +101,7 @@ fn stringify_serde_ignored_path(dst: &mut String, path: &serde_ignored::Path<'_>
     }
 }
 
-pub fn parse_v1(data: &str) -> Result<schema_v1::Manifest> {
+pub fn parse_schema_v1(data: &str) -> Result<schema_v1::Manifest> {
     parse_cargo_toml(data)
         .and_then(|toml| {
             let mut ignored = Vec::new();
@@ -118,9 +121,15 @@ pub fn parse_v1(data: &str) -> Result<schema_v1::Manifest> {
         })
 }
 
-// pub fn parse(data: &str) -> Result<v1::Manifest> {
-
-// }
+pub fn parse(data: &str) -> Result<v1::Manifest> {
+    parse_schema_v1(data)
+        .and_then(|schema_v1| {
+            
+            println!("Convert schema: {:?}", schema_v1);
+            // schema_v1_to_v1::convert(schema_v1)
+            Ok(v1::Manifest::Project)
+        })
+}
 
 #[cfg(test)]
 mod omni_toml_parser {
@@ -129,7 +138,7 @@ mod omni_toml_parser {
         extern crate omni_manifest_toml_schema_v1 as schema_v1;
 
         use crate::{ Error, TOML_WITHOUT_NEWLINES };
-        use crate::{ parse_cargo_toml, parse_toml, parse_v1 };
+        use crate::{ parse_cargo_toml, parse_toml, parse_schema_v1 };
 
         #[test]
         fn parse_valid_minimal_manifest() {
@@ -139,7 +148,7 @@ mod omni_toml_parser {
                 version = "0.1.0"
             "#);
 
-            println!("Result:\n{:?}\n", result);
+            // println!("Result:\n{:?}\n", result);
 
             assert!(result.is_ok(), "should have parsed valid toml");
         }
@@ -175,7 +184,7 @@ mod omni_toml_parser {
 
         #[test]
         fn fail_to_parse_with_unused_toml_keys() {
-            match parse_v1(r#"
+            match parse_schema_v1(r#"
                 invalid = 1
             "#) {
                 Ok(_) => assert!(false, "should have failed to parse due to presence of unused key 'invalid'"),
@@ -193,7 +202,7 @@ mod omni_toml_parser {
 
         #[test]
         fn parse_empty_toml_to_all_none_manifest_struct() {
-            match parse_v1(r#"
+            match parse_schema_v1(r#"
             "#) {
                 Ok(m) => {
                     assert_eq!(None, m.cargo_features);
@@ -221,14 +230,14 @@ mod omni_toml_parser {
 
         #[test]
         fn fail_to_parse_invalid_package() {
-            match parse_v1(r#"
+            match parse_schema_v1(r#"
             package = 1
             "#) {
                 Ok(_) => assert!(false, "should not have parsed invalid package structure"),
                 Err(err) => {
                     match err {
                         Error::DeserializerError(_) => {},
-                        _ => assert!(false, "should have gotten FailedToParseToml but was:\n{}", err),
+                        _ => assert!(false, "should have gotten DeserializerError but was:\n{}", err),
                     }
                 }
             }
@@ -236,14 +245,14 @@ mod omni_toml_parser {
 
         #[test]
         fn fail_to_parse_package_with_missing_required_fields() {
-            match parse_v1(r#"
+            match parse_schema_v1(r#"
             [package]
             "#) {
                 Ok(_) => assert!(false, "should not have parsed invalid package structure"),
                 Err(err) => {
                     match err {
                         Error::DeserializerError(_) => {},
-                        _ => assert!(false, "should have gotten FailedToParseToml but was:\n{}", err),
+                        _ => assert!(false, "should have gotten DeserializerError but was:\n{}", err),
                     }
                 }
             }
@@ -251,7 +260,7 @@ mod omni_toml_parser {
 
         #[test]
         fn parse_valid_package() {
-            match parse_v1(r#"
+            match parse_schema_v1(r#"
             [package]
             name = "foo"
             version = "1.0.0"
@@ -271,7 +280,7 @@ mod omni_toml_parser {
 
         #[test]
         fn parse_package_dependency() {
-            match parse_v1(r#"
+            match parse_schema_v1(r#"
                 [package]
                 name = "foo"
                 version = "1.0.0"
@@ -295,7 +304,7 @@ mod omni_toml_parser {
 
         #[test]
         fn parse_package_dependency_with_inline_version() {
-            match parse_v1(r#"
+            match parse_schema_v1(r#"
                 [package]
                 name = "foo"
                 version = "1.0.0"
@@ -323,7 +332,7 @@ mod omni_toml_parser {
 
         #[test]
         fn parse_package_dependency_with_version_field() {
-            match parse_v1(r#"
+            match parse_schema_v1(r#"
                 [package]
                 name = "foo"
                 version = "1.0.0"
@@ -351,7 +360,7 @@ mod omni_toml_parser {
 
         #[test]
         fn parse_package_with_empty_version_field() {
-            match parse_v1(r#"
+            match parse_schema_v1(r#"
             [package]
             name = "foo"
             version = "1.0.0"
@@ -371,6 +380,33 @@ mod omni_toml_parser {
                     }
                 },
                 Err(err) => assert!(false, "should have parsed valid package with dependency but was:\n{}", err),
+            }
+        }
+
+        #[test]
+        fn parse_workspace() {
+            match parse_schema_v1(r#"
+            [workspace]
+            members = [
+                "foo",
+                "bar"
+            ]
+            "#) {
+                Ok(m) => {
+                    match m.workspace {
+                        None => assert!(false, "should have parsed workspace list"),
+                        Some (workspace) => {
+                            match workspace.members {
+                                None => assert!(false, "should have parsed the members"),
+                                Some (members) => {
+                                    let expected_members = vec!["foo".to_owned(), "bar".to_owned()];
+                                    assert_eq!(expected_members, members)
+                                }
+                            }
+                        }
+                    }
+                },
+                Err(err) => assert!(false, "should have parsed successfully but instead:\n{}", err),
             }
         }
     }
